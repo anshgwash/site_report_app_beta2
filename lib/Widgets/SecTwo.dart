@@ -6,7 +6,6 @@
 // Elevation
 
 import 'package:flutter/material.dart';
-import 'package:site_report_app_beta2/Screens/FormText.dart';
 import 'package:site_report_app_beta2/Widgets/DwgNoWidget.dart';
 
 class SecTwo extends StatefulWidget {

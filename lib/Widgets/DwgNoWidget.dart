@@ -14,6 +14,7 @@ class DwgNo extends StatefulWidget {
 
 class _DwgNoState extends State<DwgNo> {
   final myController = TextEditingController();
+  final myOtherController = TextEditingController();
   int _cameraOcr = FlutterMobileVision.CAMERA_BACK;
   String _textValue = "";
   bool _autoFocusOcr = true;
@@ -42,11 +43,6 @@ class _DwgNoState extends State<DwgNo> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [BoxShadow(blurRadius: 10, color: Colors.grey)],
             color: Colors.white,
-            // border: Border.all(
-            //   color: Colors.teal,
-            //   style: BorderStyle.solid,
-            //   width: 0,
-            // ),
           ),
           child: Column(
             children: [
@@ -79,6 +75,7 @@ class _DwgNoState extends State<DwgNo> {
                   Expanded(
                     flex: 1,
                     child: FormBuilderTextField(
+                      controller: myOtherController,
                       name: '${widget.name}RevNo',
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
@@ -111,20 +108,24 @@ class _DwgNoState extends State<DwgNo> {
     List<OcrText> texts = [];
     try {
       texts = await FlutterMobileVision.read(
+        showText: true,
         camera: _cameraOcr,
-        flash: _torchOcr,
-        autoFocus: _autoFocusOcr,
-        multiple: _multipleOcr,
-        waitTap: _waitTapOcr,
-        showText: _showTextOcr,
-        preview: _previewOcr,
-        fps: 2.0,
+        multiple: true,
+        waitTap: true,
+        autoFocus: true,
+        fps: 1.0,
       );
       setState(() {
-        _textValue = texts[0].value; // Getting first text block...
-        if (_textValue.startsWith('TF')) {
-          print('it starts with TF');
-        }
+        texts.forEach((ocrText) {
+          if (ocrText.value.startsWith('TF')) {
+            print('$ocrText starts with TF');
+            _textValue = ocrText.value;
+          }
+        });
+        // _textValue = texts[0].value; // Getting first text block...
+        // if (_textValue.startsWith('TF')) {
+        //   print('it starts with TF');
+        // }
         myController.text = _textValue;
       });
     } on Exception {

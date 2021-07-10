@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 class YesNo extends StatelessWidget {
@@ -29,15 +30,21 @@ class YesNo extends StatelessWidget {
             FormBuilderFieldOption(
               value: 'No',
             ),
+            FormBuilderFieldOption(
+              value: 'N/A',
+            ),
           ],
         ),
         FormBuilderTextField(
           name: '$name-Remark',
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
-            labelText: 'remarks...',
+            labelText: 'Remarks',
           ),
-          maxLengthEnforced: true,
+          valueTransformer: (text) {
+            return text == null ? ' ' : text;
+          },
+          maxLengthEnforcement: MaxLengthEnforcement.enforced,
           maxLength: 100,
         ),
       ]);
@@ -58,13 +65,15 @@ class YesNo extends StatelessWidget {
           FormBuilderFieldOption(
             value: 'No',
           ),
+          FormBuilderFieldOption(
+            value: 'N/A',
+          ),
         ],
       );
     }
   }
 }
 
-// ignore: missing_return
 String yesNo({text, value}) {
   if (value[text] == 'Yes') {
     return 'Yes';
@@ -72,4 +81,8 @@ String yesNo({text, value}) {
   if (value[text] == 'No') {
     return 'No';
   }
+  if (value[text] == 'N/A') {
+    return 'N/A';
+  }
+  return ' ';
 }

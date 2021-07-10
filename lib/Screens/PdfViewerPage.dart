@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_full_pdf_viewer/full_pdf_viewer_scaffold.dart';
-import 'package:flutter_share/flutter_share.dart';
+import 'package:share/share.dart';
 
 class PdfViewerPage extends StatelessWidget {
   final String path;
@@ -20,12 +20,8 @@ class PdfViewerPage extends StatelessWidget {
           IconButton(
               icon: Icon(Icons.share),
               onPressed: () async {
-                //await Printing.sharePdf(bytes: pdf.save(), filename: '$shareName.pdf');
-                print(path);
-                await FlutterShare.shareFile(
-                    title: '$shareName', filePath: path);
+                Share.shareFiles([path], subject: '$shareName.pdf');
               }),
-          IconButton(icon: Icon(Icons.save), onPressed: () async {}),
         ],
       ),
       path: path,

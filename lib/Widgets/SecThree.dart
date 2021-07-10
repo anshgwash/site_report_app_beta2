@@ -32,6 +32,9 @@ class SecThree extends StatelessWidget {
                     labelText: 'Representing architect',
                     border: OutlineInputBorder()),
                 maxLines: 1,
+                valueTransformer: (text) {
+                  return text == null ? ' ' : text;
+                },
               ),
               SizedBox(height: 10),
               FormBuilderTextField(
@@ -40,6 +43,9 @@ class SecThree extends StatelessWidget {
                     labelText: 'Representing contractor',
                     border: OutlineInputBorder()),
                 maxLines: 1,
+                valueTransformer: (text) {
+                  return text == null ? ' ' : text;
+                },
               ),
               SizedBox(height: 10),
               FormBuilderTextField(
@@ -48,6 +54,9 @@ class SecThree extends StatelessWidget {
                     labelText: 'Representing client',
                     border: OutlineInputBorder()),
                 maxLines: 1,
+                valueTransformer: (text) {
+                  return text == null ? ' ' : text;
+                },
               ),
               SizedBox(height: 10),
             ],

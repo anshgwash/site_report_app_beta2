@@ -1,11 +1,12 @@
 // Section 4: Checklist
-
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:site_report_app_beta2/Widgets/HeaderWidget.dart';
 import 'package:site_report_app_beta2/Widgets/YesNoWidget.dart';
 
 class SecFour extends StatelessWidget {
+  final myCtrl = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -17,11 +18,6 @@ class SecFour extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [BoxShadow(blurRadius: 10, color: Colors.grey)],
             color: Colors.white,
-            // border: Border.all(
-            //   color: Colors.teal,
-            //   style: BorderStyle.solid,
-            //   width: 0,
-            // ),
           ),
           child: Column(
             children: [
@@ -72,15 +68,49 @@ class SecFour extends StatelessWidget {
               ),
               SizedBox(height: 15),
               SmallerHeader(text: '5 - Slab checking'),
+              SizedBox(height: 10),
               FormBuilderTextField(
-                name: 'lvlOfSlab',
+                name: 'slabLvl',
+                maxLength: 2,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                keyboardType: TextInputType.number,
+                maxLines: 1,
+                textCapitalization: TextCapitalization.characters,
+                textAlign: TextAlign.center,
                 decoration: const InputDecoration(
-                  labelText: 'Level of slab',
+                  border: OutlineInputBorder(),
+                  labelText: 'Slab level',
                 ),
                 valueTransformer: (text) {
-                  return text == null ? null : num.tryParse(text);
+                  return text == null ? ' ' : text;
                 },
-                keyboardType: TextInputType.number,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: FormBuilderTextField(
+                      name: 'slabLvlPart',
+                      valueTransformer: (text) {
+                        return text == null ? ' ' : 'P-$text';
+                      },
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          prefix: Text('Part -  '),
+                          counterText: '',
+                          labelText: 'Part'),
+                      maxLength: 2,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      keyboardType: TextInputType.number,
+                      maxLines: 1,
+                      textCapitalization: TextCapitalization.characters,
+                    ),
+                  ),
+                  Expanded(
+                    flex: 6,
+                    child: SizedBox(),
+                  ),
+                ],
               ),
               YesNo(
                 name: 'cutOutLift',

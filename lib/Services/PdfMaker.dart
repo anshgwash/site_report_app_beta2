@@ -1,50 +1,35 @@
 import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart' as widgets;
 import 'package:flutter/material.dart' as material;
-// dependencies
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
-import 'package:printing/printing.dart';
-// site_report_app_beta2
 import 'package:site_report_app_beta2/Screens/PdfViewerPage.dart';
 
+// add valueImage parameter
 PdfMaker(context, value, valueImage) async {
   final Document pdf = Document();
-  List<PdfImage> imagesList = new List(10);
-  List<PdfImage> elevImages = new List(4);
-  // PdfImage logoImage = await pdfImageFromImageProvider(
-  //     pdf: pdf.document, image: widgets.AssetImage('logo.png'));
-  // var logoImage = MemoryImage(File('assets/logo.png').readAsBytesSync());
+  List<MemoryImage> realImage = [];
+  List<String> realImageRemarks = [];
+  final finallogo = MemoryImage(
+      (await rootBundle.load('assets/logo.png')).buffer.asUint8List());
+
+  for (int i = 1; i < 31; i++) {
+    if (valueImage.isNotEmpty && valueImage['img$i'] != null) {
+      print('Image $i is not empty');
+      String imgFiles = valueImage['img$i'].toString();
+      print(imgFiles);
+      print(imgFiles.substring(8, imgFiles.length - 2));
+      File file = File(imgFiles.substring(8, imgFiles.length - 2));
+      realImage.add(MemoryImage(file.readAsBytesSync()));
+      realImageRemarks.add(valueImage['img$i-Remark']);
+    }
+  }
+
   var now = DateTime.now();
-  String date = '${now.day}' + '/${now.month}' + '/${now.year}';
-  String time = '${now.hour}' + ':${now.minute}';
 
-  // for (var i = 1; i q< 5; i++) {
-  //   if (!valueImage['elev$i'].isEmpty) {
-  //     print('elevation $i image is not empty');
-  //     String imgFiles = valueImage['elev$i'].toString();
-  //     var parsedImgFile = imgFiles.substring(8, imgFiles.length - 2);
-  //     var pickedImage = PdfImage.file(
-  //       pdf.document,
-  //       bytes: File(parsedImgFile).readAsBytesSync(),
-  //     );
-  //     elevImages[i - 1] = pickedImage;
-  //   }
-  // }
-
-  // for (var i = 1; i < 11; i++) {
-  //   if (!valueImage['img$i'].isEmpty) {
-  //     print('$i image is not empty');
-  //     String imgFiles = valueImage['img$i'].toString();
-  //     var parsedImgFile = imgFiles.substring(8, imgFiles.length - 2);
-  //     var pickedImage = PdfImage.file(
-  //       pdf.document,
-  //       bytes: File(parsedImgFile).readAsBytesSync(),
-  //     );
-  //     imagesList[i - 1] = pickedImage;
-  //   }
-  // }
+  String dateForName = '${now.day}' + '_${now.month}' + '_${now.year}';
 
   pdf.addPage(
     MultiPage(
@@ -53,67 +38,66 @@ PdfMaker(context, value, valueImage) async {
         build: (context) {
           return <Widget>[
             Header(
-              textStyle: TextStyle(fontSize: 19),
+              // textStyle: TextStyle(fontSize: 19),
               level: 0,
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                        '${value['projectName']} - (Site Report #${value['siteReportNo']})',
-                        style: TextStyle(fontSize: 25)),
-                    // Image.provider(logoImage,
-                    //     height: 74.3, width: 60, fit: BoxFit.contain),
+                    Text('${value['projectName']}',
+                        style: TextStyle(fontSize: 16)),
+                    Image.provider(finallogo,
+                        height: 74.3, width: 60, fit: BoxFit.contain),
                   ]),
             ),
-            Row(children: [
-              Expanded(
-                child: (Table.fromTextArray(
-                  context: context,
-                  data: <List<String>>[
-                    <String>['Category', 'Value'],
-                    <String>['Subject:', '${value['subject']}'],
-                    <String>['Arch Dwg No.:', '${value['archDwgNo']}'],
-                    <String>[
-                      'Structural Dwg No.:',
-                      '${value['structuralDwgNo']}'
-                    ],
-                    <String>['Section Dwg No.:', '${value['sectionDwgNo']}'],
-                    <String>['Elevation Dwg No.:', '${value['elevDwgNo']}'],
-                    <String>['Slab Level', '${value['slabLvl']}'],
-                    <String>['Date:', '$date'],
-                    <String>['Time:', '$time'],
-                    <String>[
-                      'Site Report No.:',
-                      '${value['siteReportNo'].toString()}'
-                    ],
-                    <String>['Site Report By:', '${value['reportBy']}'],
-                  ],
-                )),
-              ),
-              /*Expanded(
-              child: (Table.fromTextArray(
-                context: context,
-                data: <List<String>>[
-                  <String>['Category', 'Value'],
-                  <String>['Slab Level:', '${value['slabLvl']}'],
-                  <String>['Date:', '$date'],
-                  <String>['Time:', '$time'],
-                  <String>[
-                    'Site Report No.:',
-                    '${value['siteReportNo'].toString()}'
-                  ],
-                  <String>['Site Report By:', '${value['reportBy']}'],
+            Header(
+              text: '${value['subject']} check on ${value['date']}',
+              level: 2,
+            ),
+            Table.fromTextArray(
+              columnWidths: {
+                0: FractionColumnWidth(0.4),
+                1: FractionColumnWidth(0.6)
+              },
+              context: context,
+              data: <List<String>>[
+                <String>['Category', 'Value'],
+                <String>[
+                  'Arch Dwg No.:',
+                  '${value['archDwgNo']} - ${value['archRevNo']}'
                 ],
-              )),
-            ),*/
-            ]),
+                <String>[
+                  'Structural Dwg No.:',
+                  '${value['structuralDwgNo']} - ${value['structuralRevNo']}'
+                ],
+                <String>[
+                  'Section Dwg No.:',
+                  '${value['sectionDwgNo']} - ${value['sectionRevNo']}'
+                ],
+                <String>[
+                  'Elevation Dwg No.:',
+                  '${value['elevDwgNo']} - ${value['elevRevNo']}'
+                ],
+                <String>[
+                  'Slab Level',
+                  '${value['slabLvl']} - ${value['slabLvlPart']}'
+                ],
+                <String>[
+                  'Site Report No.:',
+                  '${value['siteReportNo'].toString()}'
+                ],
+                <String>['Site Report By:', '${value['reportBy']}'],
+              ],
+            ),
             SizedBox(height: 10),
             Table.fromTextArray(context: context, data: <List<String>>[
               <String>['Representing', 'Name and designation'],
               <String>['Architect', '${value['archRep']}'],
               <String>['Client', '${value['clientRep']}'],
               <String>['Contractor', '${value['contractorRep']}'],
-            ]),
+            ], columnWidths: {
+              0: FractionColumnWidth(0.4),
+              1: FractionColumnWidth(0.6)
+            }),
             Header(
               level: 2,
               child: Text('Following points were observed during site visit'),
@@ -138,7 +122,7 @@ PdfMaker(context, value, valueImage) async {
                 <String>[
                   'B',
                   'UG Tanks top slab level marking',
-                  '${yesNo(text: 'dwgUpToDate', value: value)}',
+                  '${yesNo(text: 'ugTanks', value: value)}',
                   '${value['ugTanks-Remark']}'
                 ],
                 <String>[
@@ -153,7 +137,7 @@ PdfMaker(context, value, valueImage) async {
                   'A',
                   'Open Offset Dimension',
                   '${yesNo(text: 'openOffsetDim', value: value)}',
-                  '${value['openOffsetDim-remark']}'
+                  '${value['openOffsetDim-Remark']}'
                 ],
                 <String>[
                   'B',
@@ -167,14 +151,14 @@ PdfMaker(context, value, valueImage) async {
                   'A',
                   'Overall Checking - Supporting lvl, no gaps etc.',
                   '${yesNo(text: 'shutteringCheck', value: value)}',
-                  '${value['shutteringCheck-remark']}'
+                  '${value['shutteringCheck-Remark']}'
                 ],
                 <String>[''],
                 <String>['5', 'Slab Checking', '-', '-'],
                 <String>[
                   'A',
-                  'Level Of Slab',
-                  '${yesNo(text: 'lvlOfSlab', value: value)}'
+                  'Slab level',
+                  '${yesNo(text: 'slabLvl', value: value)}'
                 ],
                 <String>[
                   'B',
@@ -344,54 +328,55 @@ PdfMaker(context, value, valueImage) async {
               <String>['Additional Remarks'],
               <String>['${value['additionalRemarks']}'],
             ], cellStyle: TextStyle(fontSize: 9)),
-            SizedBox(height: 5),
-            Header(text: 'Images', textStyle: TextStyle(fontSize: 12)),
-            // elevPlace(0, elevImages, valueImage, 'Front'),
-            // elevPlace(1, elevImages, valueImage, 'Rear'),
-            // elevPlace(2, elevImages, valueImage, 'Side 1'),
-            // elevPlace(3, elevImages, valueImage, 'Side 2'),
-            // imagePlace(0, imagesList, valueImage),
-            // imagePlace(1, imagesList, valueImage),
-            // imagePlace(2, imagesList, valueImage),
-            // imagePlace(3, imagesList, valueImage),
-            // imagePlace(4, imagesList, valueImage),
-            // imagePlace(5, imagesList, valueImage),
-            // imagePlace(6, imagesList, valueImage),
-            // imagePlace(7, imagesList, valueImage),
-            // imagePlace(8, imagesList, valueImage),
-            // imagePlace(9, imagesList, valueImage),
+            SizedBox(height: 50),
+            Table(
+              columnWidths: {
+                0: FractionColumnWidth(0.05),
+                1: FractionColumnWidth(0.5),
+                2: FractionColumnWidth(0.45)
+              },
+              children: realImage.asMap().entries.map((entry) {
+                int index = entry.key + 1;
+                print(index);
+                MemoryImage image = entry.value;
+                return TableRow(
+                  children: [
+                    Text(' ${index.toString()} ',
+                        textScaleFactor: 1.2, textAlign: TextAlign.center),
+                    Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Image.provider(image, height: 150),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(20),
+                      child: valueImage['img$index-Remark'] != null
+                          ? Text(valueImage['img$index-Remark'],
+                              textScaleFactor: 1.2)
+                          : Container(),
+                    ),
+                  ],
+                );
+              }).toList(),
+              border: TableBorder.all(),
+            ),
           ];
         }),
   );
 
-  /*
-  pdf.addPage(
-    MultiPage(
-        pageFormat: PdfPageFormat.a4,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        build: (context) {
-          return <Widget> [
-
-          ];
-        }
-    ),
-  );
-   */
-
   String shareName =
-      '${value['projectName']}_report${value['siteReportNo'].toString()}';
+      '${value['projectName']}_${value['subject'].toString()}_$dateForName';
 
   final String dir = (await getApplicationDocumentsDirectory()).path;
+  var AppDir = Directory(dir);
+  await for (var entity in AppDir.list(recursive: true, followLinks: false)) {
+    print(entity.path);
+  }
+
   print(dir);
   final String path = '$dir/$shareName.pdf';
+  // final String path = '/sdcard/download/$shareName.pdf';
   final File file = File(path);
   await file.writeAsBytes(pdf.save());
-
-  /*
-  await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => pdf.save());
-
-   */
 
   material.Navigator.of(context).push(material.MaterialPageRoute(
     builder: (_) => PdfViewerPage(path: path, pdf: pdf, shareName: shareName),
@@ -400,70 +385,13 @@ PdfMaker(context, value, valueImage) async {
 
 // ignore: missing_return
 String yesNo({text, value}) {
-  if (value[text] == 'yes') {
+  if (value[text] == 'Yes') {
     return 'Yes';
-  }
-  if (value[text] == 'no') {
+  } else if (value[text] == 'No') {
     return 'No';
-  }
-  if (value[text] == 'na') {
+  } else if (value[text] == 'N/A') {
     return 'N/A';
-  }
-  if (value[text] == null) {
-    return '';
-  }
-}
-
-Widget imagePlace(i, imagesList, valueImage) {
-  if (imagesList[i] != null) {
-    if (valueImage['img${i + 1}-Remark'] != '') {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(height: 10),
-          Image(imagesList[i], fit: BoxFit.contain, height: 250),
-          SizedBox(height: 2),
-          Text('Image ${i + 1}: ${valueImage['img${i + 1}-Remark']}'),
-          SizedBox(height: 2),
-        ],
-      );
-    } else {
-      return Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-        SizedBox(height: 10),
-        Image(imagesList[i], fit: BoxFit.contain, height: 250),
-        SizedBox(height: 2),
-        Text('Image${i + 1}'),
-      ]);
-    }
   } else {
-    return SizedBox(height: 0.01);
-  }
-}
-
-Widget elevPlace(i, elevImages, valueImage, text) {
-  if (elevImages[i] != null) {
-    if (valueImage['elev${i + 1}-Remark'] != '') {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          //Expanded(child: Image(elevImages[i], height: 650, fit: BoxFit.contain), flex: 2),
-          Image(elevImages[i], height: 600, fit: BoxFit.contain),
-          SizedBox(height: 2),
-          Text('$text: ${valueImage['elev${i + 1}-Remark']}',
-              style: TextStyle(fontSize: 14)),
-          SizedBox(height: 10),
-        ],
-      );
-    } else {
-      return Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-        //Expanded(child: Image(elevImages[i], height: 650, fit: BoxFit.contain), flex: 2),
-        Image(elevImages[i], height: 600, fit: BoxFit.contain),
-        SizedBox(height: 2),
-        Text('$text', style: TextStyle(fontSize: 14)),
-        SizedBox(height: 10),
-      ]);
-    }
-  } else {
-    return SizedBox(height: 0.01);
+    return ' ';
   }
 }

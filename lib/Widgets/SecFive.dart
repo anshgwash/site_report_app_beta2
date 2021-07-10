@@ -2,8 +2,8 @@
 // Additional Notes
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:site_report_app_beta2/Widgets/HeaderWidget.dart';
 
 class SecFive extends StatelessWidget {
   @override
@@ -17,23 +17,20 @@ class SecFive extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [BoxShadow(blurRadius: 10, color: Colors.grey)],
             color: Colors.white,
-            // border: Border.all(
-            //   color: Colors.teal,
-            //   style: BorderStyle.solid,
-            //   width: 0,
-            // ),
           ),
           child: Column(
             children: [
               FormBuilderTextField(
                 name: 'additionalRemarks',
-                maxLengthEnforced: true,
+                maxLengthEnforcement: MaxLengthEnforcement.enforced,
                 maxLines: 5,
-                textCapitalization: TextCapitalization.words,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Additional Remarks',
                 ),
+                valueTransformer: (text) {
+                  return text == null ? ' ' : text;
+                },
               ),
               SizedBox(height: 10),
             ],

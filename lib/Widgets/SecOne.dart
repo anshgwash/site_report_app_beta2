@@ -3,11 +3,21 @@
 // 2. Report By
 // 3. Type of check
 
+// TextEditingController for 'subject' value
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:site_report_app_beta2/Widgets/HeaderWidget.dart';
+// import 'package:provider/provider.dart';
 
-class SecOne extends StatelessWidget {
+TextEditingController subjectController = TextEditingController();
+
+class SecOne extends StatefulWidget {
+  @override
+  _SecOneState createState() => _SecOneState();
+}
+
+class _SecOneState extends State<SecOne> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -19,11 +29,6 @@ class SecOne extends StatelessWidget {
             boxShadow: [BoxShadow(blurRadius: 10, color: Colors.grey)],
             borderRadius: BorderRadius.circular(20),
             color: Colors.white,
-            // border: Border.all(
-            //   color: Colors.teal,
-            //   style: BorderStyle.solid,
-            //   width: 0,
-            // ),
           ),
           child: Column(
             children: [
@@ -36,9 +41,10 @@ class SecOne extends StatelessWidget {
                     labelText: 'Project Name', border: OutlineInputBorder()),
                 textCapitalization: TextCapitalization.words,
                 maxLines: 1,
+                maxLength: 60,
                 validator: (value) {
                   if (value.isEmpty) {
-                    return "\* required field";
+                    return "\*required field";
                   }
                   return null;
                 },
@@ -52,6 +58,10 @@ class SecOne extends StatelessWidget {
                 maxLines: 1,
               ),
               FormBuilderChoiceChip(
+                onChanged: (val) {
+                  subjectController.text = val;
+                  print(subjectController.text);
+                },
                 name: 'subject',
                 decoration: const InputDecoration(
                   labelText: 'Type of check',
@@ -79,6 +89,55 @@ class SecOne extends StatelessWidget {
                 },
                 autovalidateMode: AutovalidateMode.onUserInteraction,
               ),
+              SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: FormBuilderTextField(
+                      name: 'siteReportNo',
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Report No.',
+                        counterText: '',
+                      ),
+                      maxLength: 2,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      keyboardType: TextInputType.number,
+                      maxLines: 1,
+                      textCapitalization: TextCapitalization.characters,
+                      textAlign: TextAlign.center,
+                      valueTransformer: (text) {
+                        return text == null ? ' ' : text;
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: SizedBox(),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: FormBuilderDateTimePicker(
+                      name: 'date',
+                      inputType: InputType.date,
+                      initialDate: DateTime.now(),
+                      valueTransformer: (date) {
+                        return date == null
+                            ? '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}'
+                            : '${date.day}/${date.month}/${date.year}';
+                      },
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        suffixIcon: Icon(Icons.calendar_today),
+                        labelText:
+                            '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
+                      ),
+                    ),
+                  )
+                ],
+              ),
+              SizedBox(height: 20),
             ],
           ),
         ),
